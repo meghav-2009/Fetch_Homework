@@ -1,0 +1,24 @@
+services:
+  localstack:
+    image: fetchdocker/data-takehome-localstack
+    platform: linux/amd64
+    ports:
+      - "4566:4566"
+  postgres:
+    image: fetchdocker/data-takehome-postgres
+    platform: linux/amd64
+    ports:
+      - "5434:5432"  # Host port 5434 mapped to container port 5432
+  app:
+    build:
+      context: .
+    depends_on:
+      - localstack
+      - postgres
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres
+      - QUEUE_URL=http://localstack:4566/000000000000/login-queue
+      - AWS_ACCESS_KEY_ID=dummy
+      - AWS_SECRET_ACCESS_KEY=dummy
+      - AWS_DEFAULT_REGION=us-east-1
+
